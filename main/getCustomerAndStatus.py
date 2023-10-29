@@ -1,4 +1,4 @@
-from cleanText import clean_text
+from aux.cleanText import clean_text
 from selenium.webdriver.common.by import By
 
 def getCustomerAndStatus(driver, lawyerFullName):

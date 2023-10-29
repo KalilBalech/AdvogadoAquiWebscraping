@@ -5,7 +5,7 @@ from selenium.webdriver.support.select import Select
 import time
 import os
 
-from removeDigits import remove_digits
+from aux.removeDigits import remove_digits
 
 def inquiryCaseByNumber(numeroDoProcesso):
 

@@ -1,9 +1,9 @@
 from selenium.webdriver.common.by import By
 
-from getLastDownloadFile import get_last_downloaded_file
-from cleanText import clean_text
-from createTxtFile import create_txt_file
-from deleteFile import delete_file
+from aux.getLastDownloadFile import get_last_downloaded_file
+from aux.cleanText import clean_text
+from aux.createTxtFile import create_txt_file
+from aux.deleteFile import delete_file
 from pdfminer.high_level import extract_text
 
 
@@ -43,21 +43,39 @@ def getLastDocument(driver):
 
     # monitorar quanto um novo list item dentro da ul que tá dentro da div#arvore_principal
 
-    # clicar na tag a que tem um htmltext = alguma coisa, pegar o href que tá nessa tag e carregar o pdf, transformar em txt e mandar pro gpt
-
     # encontrar todos os autos
     conjuntoDeDocumentos = driver.find_element(By.ID, "arvore_principal")
     documentosAbertos = conjuntoDeDocumentos.find_elements(By.CSS_SELECTOR,".jstree-node.jstree-open")
     #documentosFechados = conjuntoDeDocumentos.find_elements(By.CSS_SELECTOR,".jstree-node.jstree-closed")
 
-    # selecionar o auto que eu quero
-    ultimoDocumentoAberto = documentosAbertos[len(documentosAbertos)-1]
+
+    documentsTitles = []
+    for document in documentosAbertos:
+        aTag = document.find_element(By.CSS_SELECTOR, ".jstree-anchor")
+        aInnerHTML = aTag.get_attribute('innerHTML')
+        for i in range(len(aInnerHTML)-1, -1, -1):  # Começa do último caractere e vai até o primeiro
+            if aInnerHTML[i] == '>':
+                documentsTitles.append(aInnerHTML[i+1:])
+                break
+
+    print('documentsTitles: ', documentsTitles)
+    shift = 0
+    for i in range(len(documentsTitles)-1, -1, -1):
+        if(documentsTitles[i] == 'Certidão' or documentsTitles[i] == 'Certidão de Publicação' or documentsTitles[i] == 'Documentos Diversos'):
+            shift += 1
+        else:
+            break
+    
+    print("shift: ", shift)
 
     time.sleep(tempoDeCarregamentoDaPagina)
+    
+    # selecionar o auto que eu quero
+    documentoAlvo = documentosAbertos[len(documentosAbertos)-1 - shift]
 
     # encontrar e clicar no link do auto que eu quero
-    tagAnchorDoUltimoDocumentoAberto = ultimoDocumentoAberto.find_element(By.CSS_SELECTOR,".jstree-anchor")
-    tagAnchorDoUltimoDocumentoAberto.click()
+    tagAnchorDocumentoAlvo = documentoAlvo.find_element(By.CSS_SELECTOR,".jstree-anchor")
+    tagAnchorDocumentoAlvo.click()
 
     time.sleep(tempoDeCarregamentoDaPagina)
 

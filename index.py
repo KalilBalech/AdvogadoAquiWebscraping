@@ -1,14 +1,14 @@
 import time # trocar o time.sleep pelo webdriver.wait -> mais inteligente
 import os
 
-from createTxtFile import create_txt_file
-from gptPromptInstructions import gptPromptInstructions
+from aux.createTxtFile import create_txt_file
+from main.gptPromptInstructions import gptPromptInstructions
 
-from inquiryCaseByNumber import inquiryCaseByNumber
-from getCustomerAndStatus import getCustomerAndStatus
-from getLastDocument import getLastDocument
+from main.inquiryCaseByNumber import inquiryCaseByNumber
+from main.getCustomerAndStatus import getCustomerAndStatus
+from main.getLastDocument import getLastDocument
 
-from sendEmail import enviar_email
+from aux.sendEmail import enviar_email
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -34,9 +34,10 @@ def buscaDeProcessoAutomatica(numeroDoProcesso):
     (customerFullName, requerente) = getCustomerAndStatus(driver, lawyerFullName)
     customerFirstName = customerFullName.split(' ')[0]
 
-    # pegar o texto do ultimo auto do processo
-    (driver, text) = getLastDocument(driver)
 
+    # pegar o texto do ultimo auto do processo
+
+    (driver, text) = getLastDocument(driver)
     gptInstructions = gptPromptInstructions(lawyerCallingName, officeName, customerFirstName, requerente)
 
     completion = openai.ChatCompletion.create(
